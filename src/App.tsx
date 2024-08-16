@@ -1,24 +1,28 @@
-import React from 'react';
-import logo from './logo.svg';
+import { useEffect, useState } from 'react';
 import './App.css';
-
+import { SimilarityMap } from './components/SimilarityMap';
+import { Node, Link } from '../types';
 function App() {
+  const [nodes, setNodes] = useState<Node[]>([]);
+  const [links, setLinks] = useState<Link[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const loadGraphData = async () => {
+      const response = await fetch('/graph.json');
+      const graph = await response.json();
+      setNodes([...graph.nodes]);
+      setLinks([...graph.links]);
+      setIsLoading(true);
+    };
+
+    loadGraphData();
+  }, []);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      {isLoading && <SimilarityMap nodes={nodes} links={links} />}
+      <div className="App-loading">Loading...</div>
     </div>
   );
 }
